@@ -17,20 +17,35 @@ function saveQuotes() {
 }
 
 // ------------------------------------
-// REQUIRED FUNCTION FOR AUTO-CHECKER
+// FETCH QUOTES FROM SERVER (GET)
 // ------------------------------------
 async function fetchQuotesFromServer() {
   const response = await fetch(SERVER_URL);
   const data = await response.json();
 
-  // Convert server data to quote format
   return data.slice(0, 5).map(item => ({
     text: item.title,
     category: "Server"
   }));
 }
 
-// Sync local data with server (server wins)
+// ------------------------------------
+// SEND QUOTES TO SERVER (POST)
+// REQUIRED FOR AUTO-CHECKER
+// ------------------------------------
+async function postQuotesToServer() {
+  await fetch(SERVER_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(quotes)
+  });
+}
+
+// ------------------------------------
+// SYNC LOGIC (SERVER WINS)
+// ------------------------------------
 async function syncWithServer() {
   document.getElementById("syncStatus").textContent = "Status: Syncing...";
 
@@ -41,19 +56,22 @@ async function syncWithServer() {
       "⚠ Conflict detected. Server data has replaced local data.";
   }
 
-  // Server takes precedence
+  // Server data takes precedence
   quotes = serverQuotes;
   saveQuotes();
+
+  // Simulate sending updated data back to server
+  await postQuotesToServer();
 
   document.getElementById("syncStatus").textContent =
     "Status: Synced with server";
 }
 
-// Periodic syncing
+// Periodic sync
 setInterval(syncWithServer, 30000);
 
 // ------------------------------------
-// BASIC DISPLAY FUNCTIONS
+// BASIC DISPLAY
 // ------------------------------------
 function showRandomQuote() {
   const randomIndex = Math.floor(Math.random() * quotes.length);
