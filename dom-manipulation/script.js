@@ -17,7 +17,7 @@ function saveQuotes() {
 }
 
 // ------------------------------------
-// FETCH QUOTES FROM SERVER (GET)
+// FETCH QUOTES FROM SERVER
 // ------------------------------------
 async function fetchQuotesFromServer() {
   const response = await fetch(SERVER_URL);
@@ -30,8 +30,7 @@ async function fetchQuotesFromServer() {
 }
 
 // ------------------------------------
-// SEND QUOTES TO SERVER (POST)
-// REQUIRED FOR AUTO-CHECKER
+// POST QUOTES TO SERVER
 // ------------------------------------
 async function postQuotesToServer() {
   await fetch(SERVER_URL, {
@@ -44,9 +43,9 @@ async function postQuotesToServer() {
 }
 
 // ------------------------------------
-// SYNC LOGIC (SERVER WINS)
+// SYNC LOGIC WRAPPED IN syncQuotes
 // ------------------------------------
-async function syncWithServer() {
+async function syncQuotes() {
   document.getElementById("syncStatus").textContent = "Status: Syncing...";
 
   const serverQuotes = await fetchQuotesFromServer();
@@ -60,18 +59,18 @@ async function syncWithServer() {
   quotes = serverQuotes;
   saveQuotes();
 
-  // Simulate sending updated data back to server
+  // Simulate sending updates back to server
   await postQuotesToServer();
 
   document.getElementById("syncStatus").textContent =
     "Status: Synced with server";
 }
 
-// Periodic sync
-setInterval(syncWithServer, 30000);
+// Periodic sync every 30 seconds
+setInterval(syncQuotes, 30000);
 
 // ------------------------------------
-// BASIC DISPLAY
+// BASIC DISPLAY FUNCTIONS
 // ------------------------------------
 function showRandomQuote() {
   const randomIndex = Math.floor(Math.random() * quotes.length);
@@ -81,4 +80,5 @@ function showRandomQuote() {
     `"${randomQuote.text}"<br><small>${randomQuote.category}</small>`;
 }
 
+// Event listener
 document.getElementById("newQuote").addEventListener("click", showRandomQuote);
